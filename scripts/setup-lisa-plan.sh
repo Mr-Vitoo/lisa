@@ -1,0 +1,294 @@
+#!/bin/bash
+
+# Lisa Plan Setup Script
+# Creates state file and initializes the interview session
+
+set -euo pipefail
+
+# Parse arguments
+FEATURE_NAME=""
+CONTEXT_FILE=""
+OUTPUT_DIR="docs/specs"
+MAX_QUESTIONS=0  # Unlimited by default
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    -h|--help)
+      cat << 'HELP_EOF'
+Lisa Plan - Interactive specification gathering workflow
+
+Lisa plans. Ralph does.
+
+USAGE:
+  /lisa-plan <FEATURE_NAME> [OPTIONS]
+
+ARGUMENTS:
+  FEATURE_NAME    Name of the feature to spec out (required)
+
+OPTIONS:
+  --context <file>      Initial context file (PRD, requirements, etc.)
+  --output-dir <dir>    Output directory for specs (default: docs/specs)
+  --max-questions <n>   Maximum question rounds (default: unlimited)
+  -h, --help            Show this help
+
+DESCRIPTION:
+  Conducts an in-depth interview to gather requirements and generate
+  a comprehensive specification. Questions are adaptive and non-obvious,
+  covering technical implementation, UX, trade-offs, and concerns.
+
+  The interview continues until you say "done" or "finalize".
+
+EXAMPLES:
+  /lisa-plan "user authentication"
+  /lisa-plan "payment processing" --context docs/PRD.md
+  /lisa-plan "search feature" --output-dir specs/features
+
+OUTPUT:
+  Final spec saved to: {output-dir}/{feature-slug}.md
+  Draft maintained at: .claude/lisa-plan-draft.md
+
+WORKFLOW:
+  1. Lisa plans - Generate spec: /lisa-plan "my feature"
+  2. Ralph does - Implement: /ralph-loop
+
+  Lisa plans. Ralph does. Ship faster.
+HELP_EOF
+      exit 0
+      ;;
+    --context)
+      CONTEXT_FILE="$2"
+      shift 2
+      ;;
+    --output-dir)
+      OUTPUT_DIR="$2"
+      shift 2
+      ;;
+    --max-questions)
+      MAX_QUESTIONS="$2"
+      shift 2
+      ;;
+    *)
+      if [[ -z "$FEATURE_NAME" ]]; then
+        FEATURE_NAME="$1"
+      else
+        FEATURE_NAME="$FEATURE_NAME $1"
+      fi
+      shift
+      ;;
+  esac
+done
+
+# Validate feature name
+if [[ -z "$FEATURE_NAME" ]]; then
+  echo "Error: Feature name is required" >&2
+  echo "" >&2
+  echo "   Example: /lisa-plan \"user authentication\"" >&2
+  exit 1
+fi
+
+# Create output directory
+mkdir -p "$OUTPUT_DIR"
+mkdir -p .claude
+
+# Generate slug for filename
+FEATURE_SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
+SPEC_PATH="$OUTPUT_DIR/$FEATURE_SLUG.md"
+DRAFT_PATH=".claude/lisa-plan-draft.md"
+TIMESTAMP=$(date +%Y-%m-%d)
+
+# Read context file if provided
+CONTEXT_CONTENT=""
+if [[ -n "$CONTEXT_FILE" ]] && [[ -f "$CONTEXT_FILE" ]]; then
+  CONTEXT_CONTENT=$(cat "$CONTEXT_FILE")
+fi
+
+# Build the interview prompt - use a temp file to avoid quoting issues
+PROMPT_FILE=$(mktemp)
+
+cat > "$PROMPT_FILE" << 'STATIC_PROMPT_EOF'
+# Lisa Plan Interview Session
+
+You are conducting a comprehensive specification interview for a feature. Your goal is to gather enough information to write a complete, implementable specification.
+
+## CRITICAL RULES - READ CAREFULLY
+
+### 1. USE AskUserQuestion FOR ALL QUESTIONS
+You MUST use the AskUserQuestion tool for every question you ask. Plain text questions will NOT work - the user won't see them. Every question must go through AskUserQuestion.
+
+### 2. ASK NON-OBVIOUS QUESTIONS
+DO NOT ask basic clarifying questions like "What should this feature do?" or "Who are the users?"
+
+Instead, ask probing questions like:
+- "How should X interact with the existing Y system?"
+- "What happens when Z fails? Should we retry, queue, or alert?"
+- "Would you prefer approach A (faster but less flexible) or B (more complex but extensible)?"
+- "Walk me through the exact flow when a user does X"
+- "What are your latency requirements for this operation?"
+- "Who should have access to this? What's the authorization model?"
+
+### 3. CONTINUE UNTIL USER SAYS STOP
+The interview continues until the user explicitly says "done", "finalize", "finished", or similar. Do NOT stop after one round of questions. After each answer, immediately ask the next question using AskUserQuestion.
+
+### 4. MAINTAIN RUNNING NOTES
+After every 2-3 questions, update the draft spec file with accumulated information. This ensures nothing is lost.
+
+### 5. BE ADAPTIVE
+Base your next question on previous answers. If the user mentions something interesting, probe deeper. Do not follow a rigid script.
+
+## QUESTION CATEGORIES TO COVER
+
+**Technical Implementation:**
+- Data models and storage (tables, fields, relationships)
+- API design (endpoints, methods, payloads, auth)
+- Integration with existing systems
+- Error handling and edge cases
+
+**User Experience:**
+- User flows and journeys
+- Edge cases and error states
+- Accessibility considerations
+- Mobile vs. desktop differences
+
+**Trade-offs and Concerns:**
+- Performance requirements
+- Security considerations
+- Scalability expectations
+- Technical debt concerns
+- MVP scope vs. full vision
+
+## YOUR WORKFLOW
+
+1. Read any provided context
+2. Ask your first NON-OBVIOUS question using AskUserQuestion
+3. After user responds, update draft spec if you have gathered enough for a section
+4. Ask the next question immediately using AskUserQuestion
+5. Repeat until user says "done" or "finalize"
+6. When user signals completion, write final spec and output <promise>SPEC COMPLETE</promise>
+STATIC_PROMPT_EOF
+
+# Add context to the prompt if provided
+if [[ -n "$CONTEXT_CONTENT" ]]; then
+  cat >> "$PROMPT_FILE" << CONTEXT_EOF
+
+## PROVIDED CONTEXT
+
+\`\`\`
+$CONTEXT_CONTENT
+\`\`\`
+CONTEXT_EOF
+fi
+
+# Add session info
+cat >> "$PROMPT_FILE" << SESSION_EOF
+
+## SESSION INFORMATION
+
+- **Feature:** $FEATURE_NAME
+- **Draft File:** $DRAFT_PATH (update this as you gather information)
+- **Final Spec:** $SPEC_PATH (write here when user says done)
+- **Started:** $TIMESTAMP
+
+---
+
+## BEGIN INTERVIEW NOW
+
+Start by asking your first non-obvious question about "$FEATURE_NAME" using the AskUserQuestion tool. Remember: EVERY question must use AskUserQuestion - plain text questions will not work!
+SESSION_EOF
+
+# Read the complete prompt
+INTERVIEW_PROMPT=$(cat "$PROMPT_FILE")
+rm "$PROMPT_FILE"
+
+# Write state file
+cat > .claude/lisa-plan.local.md << STATE_EOF
+---
+active: true
+iteration: 1
+max_iterations: $MAX_QUESTIONS
+started_at: "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+feature_name: "$FEATURE_NAME"
+feature_slug: "$FEATURE_SLUG"
+output_dir: "$OUTPUT_DIR"
+spec_path: "$SPEC_PATH"
+draft_path: "$DRAFT_PATH"
+context_file: "$CONTEXT_FILE"
+---
+
+$INTERVIEW_PROMPT
+STATE_EOF
+
+# Initialize draft spec
+cat > "$DRAFT_PATH" << DRAFT_EOF
+# Specification Draft: $FEATURE_NAME
+
+*Interview in progress - Started: $TIMESTAMP*
+
+## Overview
+[To be filled during interview]
+
+## Problem Statement
+[To be filled during interview]
+
+## User Stories
+[To be filled during interview]
+
+## Technical Design
+
+### Data Model
+[To be filled during interview]
+
+### API Endpoints
+[To be filled during interview]
+
+### Integration Points
+[To be filled during interview]
+
+## User Experience
+
+### User Flows
+[To be filled during interview]
+
+### Edge Cases
+[To be filled during interview]
+
+## Requirements
+
+### Functional Requirements
+[To be filled during interview]
+
+### Non-Functional Requirements
+[To be filled during interview]
+
+## Open Questions
+[To be filled during interview]
+
+## Implementation Notes
+[To be filled during interview]
+
+---
+*Interview notes will be accumulated below as the interview progresses*
+---
+
+DRAFT_EOF
+
+# Output setup message
+echo "Lisa Plan - Interview Started"
+echo ""
+echo "Feature: $FEATURE_NAME"
+echo "Draft: $DRAFT_PATH"
+echo "Output: $SPEC_PATH"
+if [[ -n "$CONTEXT_FILE" ]]; then
+  echo "Context: $CONTEXT_FILE"
+fi
+if [[ $MAX_QUESTIONS -gt 0 ]]; then
+  echo "Max Questions: $MAX_QUESTIONS"
+else
+  echo "Max Questions: unlimited"
+fi
+echo ""
+echo "The interview will continue until you say \"done\" or \"finalize\"."
+echo "All questions will use the AskUserQuestion tool."
+echo ""
+echo "Beginning interview..."
+echo ""
+echo "$INTERVIEW_PROMPT"
