@@ -1,5 +1,5 @@
 ---
-description: "Explain the lisa-plan workflow"
+description: "Explain the lisa workflow"
 ---
 
 # Lisa Plan Help
@@ -23,15 +23,15 @@ Based on the technique described by @trq212: Start with a minimal spec, have Cla
 
 ## Available Commands
 
-### /lisa-plan <FEATURE_NAME> [OPTIONS]
+### /lisa:plan <FEATURE_NAME> [OPTIONS]
 
 Start a specification interview for a feature.
 
 **Usage:**
 ```
-/lisa-plan "user authentication"
-/lisa-plan "payment processing" --context docs/PRD.md
-/lisa-plan "search feature" --output-dir specs/features --max-questions 20
+/lisa:plan "user authentication"
+/lisa:plan "payment processing" --context docs/PRD.md
+/lisa:plan "search feature" --output-dir specs/features --max-questions 20
 ```
 
 **Options:**
@@ -39,7 +39,7 @@ Start a specification interview for a feature.
 - `--output-dir <dir>` - Output directory for specs (default: docs/specs)
 - `--max-questions <n>` - Maximum question rounds (default: unlimited)
 
-### /lisa-plan:help
+### /lisa:help
 
 Show this help message.
 
@@ -60,13 +60,13 @@ The interview covers:
 
 ## Output
 
-- **Draft (during interview):** `.claude/lisa-plan-draft.md`
+- **Draft (during interview):** `.claude/lisa-draft.md`
 - **Final spec:** `docs/specs/{feature-slug}.md`
 
 ## Example Session
 
 ```
-You: /lisa-plan "file upload feature"
+You: /lisa:plan "file upload feature"
 Claude: [Asks about file types, size limits, storage backend via AskUserQuestion]
 You: [Answers]
 Claude: [Asks about virus scanning, thumbnail generation]
@@ -80,7 +80,7 @@ Claude: [Writes final spec to docs/specs/file-upload-feature.md]
 
 To cancel an active interview, delete the state file:
 ```bash
-rm .claude/lisa-plan.local.md
+rm .claude/lisa.local.md
 ```
 
 ## Using the Spec
@@ -93,7 +93,7 @@ cat docs/specs/your-feature.md | claude
 
 ## Complete Workflow: Lisa + Ralph
 
-1. **Lisa plans** - Generate comprehensive spec: `/lisa-plan "my feature"`
+1. **Lisa plans** - Generate comprehensive spec: `/lisa:plan "my feature"`
 2. **Ralph does** - Implement iteratively: `/ralph-loop`
 
 Lisa plans. Ralph does. Ship faster.

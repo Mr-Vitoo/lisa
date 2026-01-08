@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Lisa Plan Setup Script
+# Lisa Setup Script
 # Creates state file and initializes the interview session
 
 set -euo pipefail
@@ -20,7 +20,7 @@ Lisa Plan - Interactive specification gathering workflow
 Lisa plans. Ralph does.
 
 USAGE:
-  /lisa-plan <FEATURE_NAME> [OPTIONS]
+  /lisa:plan <FEATURE_NAME> [OPTIONS]
 
 ARGUMENTS:
   FEATURE_NAME    Name of the feature to spec out (required)
@@ -39,16 +39,16 @@ DESCRIPTION:
   The interview continues until you say "done" or "finalize".
 
 EXAMPLES:
-  /lisa-plan "user authentication"
-  /lisa-plan "payment processing" --context docs/PRD.md
-  /lisa-plan "search feature" --output-dir specs/features
+  /lisa:plan "user authentication"
+  /lisa:plan "payment processing" --context docs/PRD.md
+  /lisa:plan "search feature" --output-dir specs/features
 
 OUTPUT:
   Final spec saved to: {output-dir}/{feature-slug}.md
-  Draft maintained at: .claude/lisa-plan-draft.md
+  Draft maintained at: .claude/lisa-draft.md
 
 WORKFLOW:
-  1. Lisa plans - Generate spec: /lisa-plan "my feature"
+  1. Lisa plans - Generate spec: /lisa:plan "my feature"
   2. Ralph does - Implement: /ralph-loop
 
   Lisa plans. Ralph does. Ship faster.
@@ -82,7 +82,7 @@ done
 if [[ -z "$FEATURE_NAME" ]]; then
   echo "Error: Feature name is required" >&2
   echo "" >&2
-  echo "   Example: /lisa-plan \"user authentication\"" >&2
+  echo "   Example: /lisa:plan \"user authentication\"" >&2
   exit 1
 fi
 
@@ -93,7 +93,7 @@ mkdir -p .claude
 # Generate slug for filename
 FEATURE_SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
 SPEC_PATH="$OUTPUT_DIR/$FEATURE_SLUG.md"
-DRAFT_PATH=".claude/lisa-plan-draft.md"
+DRAFT_PATH=".claude/lisa-draft.md"
 TIMESTAMP=$(date +%Y-%m-%d)
 
 # Read context file if provided
@@ -156,6 +156,12 @@ Base your next question on previous answers. If the user mentions something inte
 - Technical debt concerns
 - MVP scope vs. full vision
 
+**Verification & Definition of Done:**
+- What commands verify the feature works? (test suite, typecheck, build, lint)
+- What are the acceptance criteria for each user story? (specific, testable conditions)
+- How will we know this feature is "done"? (observable outcomes)
+- What should fail if this feature breaks? (regression tests)
+
 ## YOUR WORKFLOW
 
 1. Read any provided context
@@ -200,7 +206,7 @@ INTERVIEW_PROMPT=$(cat "$PROMPT_FILE")
 rm "$PROMPT_FILE"
 
 # Write state file
-cat > .claude/lisa-plan.local.md << STATE_EOF
+cat > .claude/lisa.local.md << STATE_EOF
 ---
 active: true
 iteration: 1
@@ -230,6 +236,20 @@ cat > "$DRAFT_PATH" << DRAFT_EOF
 [To be filled during interview]
 
 ## User Stories
+
+<!-- Format each story with acceptance criteria:
+
+### US-1: [Story Title]
+**As a** [user type]
+**I want to** [action]
+**So that** [benefit]
+
+**Acceptance Criteria:**
+- [ ] [Testable criterion 1]
+- [ ] [Testable criterion 2]
+
+-->
+
 [To be filled during interview]
 
 ## Technical Design
@@ -258,6 +278,26 @@ cat > "$DRAFT_PATH" << DRAFT_EOF
 
 ### Non-Functional Requirements
 [To be filled during interview]
+
+## Definition of Done
+
+This feature is complete when:
+- [ ] All acceptance criteria in user stories pass
+- [ ] Tests pass: \`[verification command]\`
+- [ ] Types/lint check: \`[verification command]\`
+- [ ] [Other verification steps gathered during interview]
+
+## Ralph Loop Command
+
+<!-- Generated at finalization based on gathered requirements -->
+
+\`\`\`bash
+/ralph-loop "Implement $FEATURE_NAME per spec at $SPEC_PATH
+
+[Verification steps will be filled in at finalization]
+
+Output <promise>COMPLETE</promise> when finished." --max-iterations 30 --completion-promise "COMPLETE"
+\`\`\`
 
 ## Open Questions
 [To be filled during interview]

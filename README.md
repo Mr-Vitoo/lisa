@@ -1,4 +1,4 @@
-# Lisa Plan Plugin
+# Lisa Plugin
 
 **Lisa plans. Ralph does.**
 
@@ -16,16 +16,16 @@ This plugin automates that workflow with a Stop hook that ensures Claude continu
 
 ```bash
 # Start an interview
-/lisa-plan "user authentication"
+/lisa:plan "user authentication"
 
 # With context file
-/lisa-plan "payment processing" --context docs/PRD.md
+/lisa:plan "payment processing" --context docs/PRD.md
 
 # With custom output directory
-/lisa-plan "search feature" --output-dir specs/features
+/lisa:plan "search feature" --output-dir specs/features
 
 # With question limit
-/lisa-plan "caching layer" --max-questions 15
+/lisa:plan "caching layer" --max-questions 15
 ```
 
 ## How It Works
@@ -41,17 +41,17 @@ This plugin automates that workflow with a Stop hook that ensures Claude continu
 ## Files
 
 ```
-.claude/plugins/lisa-plan/
+.claude/plugins/lisa/
 ├── .claude-plugin/
 │   └── plugin.json          # Plugin metadata
 ├── commands/
-│   ├── lisa-plan.md         # Main command
-│   └── help.md              # Help documentation
+│   ├── plan.md              # Main command (/lisa:plan)
+│   └── help.md              # Help documentation (/lisa:help)
 ├── hooks/
 │   ├── hooks.json           # Hook registration
 │   └── stop-hook.sh         # Interview continuation logic
 ├── scripts/
-│   └── setup-lisa-plan.sh
+│   └── setup-lisa.sh
 └── README.md
 ```
 
@@ -59,13 +59,13 @@ This plugin automates that workflow with a Stop hook that ensures Claude continu
 
 During an interview, these files are created:
 
-- `.claude/lisa-plan.local.md` - Interview state (delete to cancel)
-- `.claude/lisa-plan-draft.md` - Running draft spec
+- `.claude/lisa.local.md` - Interview state (delete to cancel)
+- `.claude/lisa-draft.md` - Running draft spec
 
 ## Canceling an Interview
 
 ```bash
-rm .claude/lisa-plan.local.md
+rm .claude/lisa.local.md
 ```
 
 ## Using the Generated Spec
@@ -82,7 +82,7 @@ cat docs/specs/your-feature.md | claude
 
 ## Complete Workflow: Lisa + Ralph
 
-1. **Lisa plans** - Generate comprehensive spec: `/lisa-plan "my feature"`
+1. **Lisa plans** - Generate comprehensive spec: `/lisa:plan "my feature"`
 2. **Ralph does** - Implement iteratively: `/ralph-loop`
 
 Lisa plans. Ralph does. Ship faster.

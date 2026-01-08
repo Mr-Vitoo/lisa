@@ -1,7 +1,7 @@
 ---
 description: "Start a specification interview for a feature"
 argument-hint: "FEATURE_NAME [--context FILE] [--output-dir DIR] [--max-questions N]"
-allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/setup-lisa-plan.sh:*)", "AskUserQuestion", "Read", "Write", "Glob", "Grep"]
+allowed-tools: ["Bash(${CLAUDE_PLUGIN_ROOT}/scripts/setup-lisa.sh:*)", "AskUserQuestion", "Read", "Write", "Glob", "Grep"]
 hide-from-slash-command-tool: "true"
 ---
 
@@ -10,7 +10,7 @@ hide-from-slash-command-tool: "true"
 Execute the setup script to initialize the specification interview:
 
 ```!
-"${CLAUDE_PLUGIN_ROOT}/scripts/setup-lisa-plan.sh" $ARGUMENTS
+"${CLAUDE_PLUGIN_ROOT}/scripts/setup-lisa.sh" $ARGUMENTS
 ```
 
 You are now conducting a comprehensive specification interview. Follow the instructions provided by the setup script exactly.

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Lisa Plan Stop Hook
-# Prevents session exit when a Lisa Plan interview is active
+# Lisa Stop Hook
+# Prevents session exit when a Lisa interview is active
 # Continues the interview until user says "done" or "finalize"
 
 set -euo pipefail
@@ -10,7 +10,7 @@ set -euo pipefail
 HOOK_INPUT=$(cat)
 
 # State file location
-STATE_FILE=".claude/lisa-plan.local.md"
+STATE_FILE=".claude/lisa.local.md"
 
 if [[ ! -f "$STATE_FILE" ]]; then
   # No active interview - allow exit
@@ -27,14 +27,14 @@ DRAFT_PATH=$(echo "$FRONTMATTER" | grep '^draft_path:' | sed 's/draft_path: *//'
 
 # Validate iteration
 if [[ ! "$ITERATION" =~ ^[0-9]+$ ]]; then
-  echo "Warning: Lisa Plan state file corrupted (invalid iteration)" >&2
+  echo "Warning: Lisa state file corrupted (invalid iteration)" >&2
   rm "$STATE_FILE"
   exit 0
 fi
 
 # Check max iterations (if set and > 0)
 if [[ "$MAX_ITERATIONS" =~ ^[0-9]+$ ]] && [[ $MAX_ITERATIONS -gt 0 ]] && [[ $ITERATION -ge $MAX_ITERATIONS ]]; then
-  echo "Lisa Plan: Max questions ($MAX_ITERATIONS) reached."
+  echo "Lisa: Max questions ($MAX_ITERATIONS) reached."
   echo "   Draft spec saved at: $DRAFT_PATH"
   echo "   Run /finalize-spec to complete, or continue manually."
   rm "$STATE_FILE"
@@ -45,7 +45,7 @@ fi
 TRANSCRIPT_PATH=$(echo "$HOOK_INPUT" | jq -r '.transcript_path')
 
 if [[ ! -f "$TRANSCRIPT_PATH" ]]; then
-  echo "Warning: Lisa Plan transcript not found" >&2
+  echo "Warning: Lisa transcript not found" >&2
   rm "$STATE_FILE"
   exit 0
 fi
@@ -70,7 +70,7 @@ LAST_OUTPUT=$(echo "$LAST_LINE" | jq -r '
 PROMISE_TEXT=$(echo "$LAST_OUTPUT" | perl -0777 -pe 's/.*?<promise>(.*?)<\/promise>.*/$1/s; s/^\s+|\s+$//g; s/\s+/ /g' 2>/dev/null || echo "")
 
 if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "SPEC COMPLETE" ]]; then
-  echo "Lisa Plan interview complete!"
+  echo "Lisa interview complete!"
   echo "   Final spec saved to: $SPEC_PATH"
   rm "$STATE_FILE"
   exit 0
@@ -105,8 +105,14 @@ if [[ -n "$USER_MESSAGES" ]]; then
 
 FINALIZATION INSTRUCTIONS:
 1. Read the draft spec file at '$DRAFT_PATH' to see all accumulated information
-2. Write the final, polished specification to '$SPEC_PATH'
-3. The final spec should be comprehensive and ready for implementation
+2. Write the final, polished specification to '$SPEC_PATH' with:
+   - Each user story formatted with testable acceptance criteria (checkbox format: - [ ])
+   - A 'Definition of Done' section with specific verification commands
+   - A 'Ralph Loop Command' section with a ready-to-use /ralph-loop command
+3. The Ralph command should:
+   - Reference the spec path: $SPEC_PATH
+   - Include the verification commands from Definition of Done
+   - Use --max-iterations 30 --completion-promise \"COMPLETE\"
 4. After writing the final spec, output: <promise>SPEC COMPLETE</promise>
 
 Do this now - write the final spec and output the completion promise."
@@ -141,7 +147,7 @@ if [[ -z "$PROMPT_TEXT" ]]; then
 fi
 
 # Build system message with iteration count
-SYSTEM_MSG="Lisa Plan round $NEXT_ITERATION | Continue asking questions until user says 'done' or 'finalize'"
+SYSTEM_MSG="Lisa round $NEXT_ITERATION | Continue asking questions until user says 'done' or 'finalize'"
 
 # Output JSON to block the stop and feed prompt back
 jq -n \
