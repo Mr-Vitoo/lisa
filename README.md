@@ -14,6 +14,16 @@ Based on the technique described by [@trq212](https://twitter.com/trq212):
 
 This plugin automates that workflow with a Stop hook that ensures Claude continues interviewing until you explicitly say "done".
 
+## Installation
+
+```bash
+# Add the marketplace
+/plugin marketplace add blencorp/lisa
+
+# Install the plugin
+/plugin install lisa
+```
+
 ## Usage
 
 ```bash

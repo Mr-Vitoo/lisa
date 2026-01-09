@@ -1,0 +1,21 @@
+{
+  "name": "lisa",
+  "owner": {
+    "name": "BLEN, Inc",
+    "email": "engineering@blencorp.com"
+  },
+  "metadata": {
+    "description": "Interactive specification interview workflow for Claude Code"
+  },
+  "plugins": [
+    {
+      "name": "lisa",
+      "source": ".",
+      "description": "Interactive specification interview workflow that conducts in-depth feature interviews using AskUserQuestion and generates comprehensive specs. Lisa plans. Ralph does.",
+      "version": "1.0.0",
+      "author": {
+        "name": "BLEN Starter Kit"
+      }
+    }
+  ]
+}
