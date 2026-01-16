@@ -51,6 +51,8 @@ EXAMPLES:
 
 OUTPUT:
   Final spec saved to: {output-dir}/{feature-slug}.md
+  Structured JSON:     {output-dir}/{feature-slug}.json
+  Progress file:       {output-dir}/{feature-slug}-progress.txt
   Draft maintained at: .claude/lisa-draft.md
 
 WORKFLOW:
@@ -103,6 +105,8 @@ mkdir -p .claude
 # Generate slug for filename
 FEATURE_SLUG=$(echo "$FEATURE_NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '-' | tr -cd '[:alnum:]-')
 SPEC_PATH="$OUTPUT_DIR/$FEATURE_SLUG.md"
+JSON_PATH="$OUTPUT_DIR/$FEATURE_SLUG.json"
+PROGRESS_PATH="$OUTPUT_DIR/$FEATURE_SLUG-progress.txt"
 DRAFT_PATH=".claude/lisa-draft.md"
 TIMESTAMP=$(date +%Y-%m-%d)
 
@@ -297,6 +301,8 @@ feature_name: "$FEATURE_NAME"
 feature_slug: "$FEATURE_SLUG"
 output_dir: "$OUTPUT_DIR"
 spec_path: "$SPEC_PATH"
+json_path: "$JSON_PATH"
+progress_path: "$PROGRESS_PATH"
 draft_path: "$DRAFT_PATH"
 context_file: "$CONTEXT_FILE"
 first_principles: $FIRST_PRINCIPLES
@@ -460,6 +466,8 @@ echo ""
 echo "Feature: $FEATURE_NAME"
 echo "Draft: $DRAFT_PATH"
 echo "Output: $SPEC_PATH"
+echo "JSON: $JSON_PATH"
+echo "Progress: $PROGRESS_PATH"
 if [[ -n "$CONTEXT_FILE" ]]; then
   echo "Context: $CONTEXT_FILE"
 fi

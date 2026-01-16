@@ -23,6 +23,8 @@ ITERATION=$(echo "$FRONTMATTER" | grep '^iteration:' | sed 's/iteration: *//')
 MAX_ITERATIONS=$(echo "$FRONTMATTER" | grep '^max_iterations:' | sed 's/max_iterations: *//')
 FEATURE_NAME=$(echo "$FRONTMATTER" | grep '^feature_name:' | sed 's/feature_name: *//' | sed 's/^"\(.*\)"$/\1/')
 SPEC_PATH=$(echo "$FRONTMATTER" | grep '^spec_path:' | sed 's/spec_path: *//' | sed 's/^"\(.*\)"$/\1/')
+JSON_PATH=$(echo "$FRONTMATTER" | grep '^json_path:' | sed 's/json_path: *//' | sed 's/^"\(.*\)"$/\1/')
+PROGRESS_PATH=$(echo "$FRONTMATTER" | grep '^progress_path:' | sed 's/progress_path: *//' | sed 's/^"\(.*\)"$/\1/')
 DRAFT_PATH=$(echo "$FRONTMATTER" | grep '^draft_path:' | sed 's/draft_path: *//' | sed 's/^"\(.*\)"$/\1/')
 
 # Validate iteration
@@ -72,6 +74,8 @@ PROMISE_TEXT=$(echo "$LAST_OUTPUT" | perl -0777 -pe 's/.*?<promise>(.*?)<\/promi
 if [[ -n "$PROMISE_TEXT" ]] && [[ "$PROMISE_TEXT" = "SPEC COMPLETE" ]]; then
   echo "Lisa interview complete!"
   echo "   Final spec saved to: $SPEC_PATH"
+  echo "   Structured JSON:     $JSON_PATH"
+  echo "   Progress file:       $PROGRESS_PATH"
   rm "$STATE_FILE"
   exit 0
 fi
@@ -136,9 +140,43 @@ FINALIZATION INSTRUCTIONS:
    - ESCAPE HATCH section: 'After 20 iterations without progress: Document what's blocking in the spec file under Implementation Notes, list approaches attempted, stop and ask for human guidance'
    - Use --max-iterations 30 --completion-promise \"COMPLETE\"
 
-4. After writing the final spec, output: <promise>SPEC COMPLETE</promise>
+4. Generate '$JSON_PATH' with this EXACT structure:
+   {
+     \"project\": \"[feature-slug from the spec]\",
+     \"branchName\": \"ralph/[feature-slug]\",
+     \"description\": \"[one-line feature description]\",
+     \"userStories\": [
+       {
+         \"id\": \"US-001\",
+         \"category\": \"[core|setup|integration|polish]\",
+         \"title\": \"[story title]\",
+         \"description\": \"[As a user, I want... so that...]\",
+         \"acceptanceCriteria\": [
+           \"[specific, verifiable criterion]\",
+           \"[another criterion]\"
+         ],
+         \"passes\": false,
+         \"notes\": \"\"
+       }
+     ]
+   }
 
-Do this now - write the final spec and output the completion promise."
+   CATEGORY VALUES:
+   - \"setup\": Initial setup, configuration, scaffolding
+   - \"core\": Core feature functionality
+   - \"integration\": Connecting with other systems/features
+   - \"polish\": UI refinements, error handling, edge cases
+
+   IMPORTANT for acceptanceCriteria:
+   - Must be specific and verifiable (not \"works correctly\")
+   - Include test commands where applicable
+   - Map directly from user story acceptance criteria in the PRD
+
+5. Create an empty file at '$PROGRESS_PATH' (Ralph will append learnings during implementation)
+
+6. After writing all three files, output: <promise>SPEC COMPLETE</promise>
+
+Do this now - write the final spec (.md), structured JSON (.json), create the empty progress file (.txt), and output the completion promise."
 
     jq -n \
       --arg prompt "$FINALIZE_PROMPT" \
