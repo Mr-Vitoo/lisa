@@ -273,7 +273,7 @@ lisa/
 
 ## Version
 
-- **Version:** 1.0.4
+- **Version:** 1.0.6
 - **Author:** BLEN Engineering Team
 
 ---
