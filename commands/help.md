@@ -39,6 +39,37 @@ Start a specification interview for a feature.
 - `--output-dir <dir>` - Output directory for specs (default: docs/specs)
 - `--max-questions <n>` - Maximum question rounds (default: unlimited)
 
+### /lisa:resume
+
+Resume an interrupted specification interview.
+
+**Usage:**
+```
+/lisa:resume
+```
+
+If you have interrupted interviews (session ended mid-interview), this command will:
+1. List all in-progress interviews with feature names and timestamps
+2. Let you select which interview to resume
+3. Continue the interview from where you left off
+
+If no interrupted interviews exist, it will suggest using `/lisa:plan` to start a new one.
+
+### /lisa:cleanup
+
+Clean up all Lisa interview state files.
+
+**Usage:**
+```
+/lisa:cleanup
+```
+
+This command removes all interview state files from `.claude/lisa-*.md`. Use this when you want to:
+- Abandon all in-progress interviews
+- Reset Lisa to a clean state
+
+Note: This does NOT delete completed specs in `docs/specs/`.
+
 ### /lisa:help
 
 Show this help message.

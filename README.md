@@ -12,7 +12,7 @@ Based on the technique described by [@trq212](https://twitter.com/trq212):
 
 > My favorite way to use Claude Code to build large features is spec based. Start with a minimal spec or prompt and ask Claude to interview you using the AskUserQuestion tool about literally anything: technical implementation, UI & UX, concerns, tradeoffs, etc. Then make a new session to execute the spec.
 
-This plugin automates that workflow with a Stop hook that ensures Claude continues interviewing until you explicitly say "done".
+This plugin automates that workflow with explicit commands for starting, resuming, and cleaning up interviews.
 
 ## Installation
 
@@ -64,6 +64,33 @@ Start a specification interview for a feature.
 # Combined options
 /lisa:plan "api gateway" --context docs/arch.md --first-principles --max-questions 20
 ```
+
+### `/lisa:resume`
+
+Resume an interrupted specification interview.
+
+```bash
+/lisa:resume
+```
+
+If you have interviews that were interrupted (session ended mid-interview), this command will:
+1. List all in-progress interviews with feature names and timestamps
+2. Let you select which interview to resume
+3. Continue the interview from where you left off
+
+### `/lisa:cleanup`
+
+Clean up all Lisa interview state files.
+
+```bash
+/lisa:cleanup
+```
+
+Removes all interview state files from `.claude/lisa-*.md`. Use this to:
+- Abandon all in-progress interviews
+- Reset Lisa to a clean state
+
+Note: This does NOT delete completed specs in `docs/specs/`.
 
 ### `/lisa:help`
 
@@ -123,9 +150,10 @@ The JSON output follows the [snarktank/ralph](https://github.com/snarktank/ralph
 
 2. **Interview Loop**:
    - Claude asks probing questions using `AskUserQuestion` tool
-   - When Claude tries to stop, the Stop hook intercepts and continues
+   - Interview continues until you say "done" or "finalize"
    - Draft spec updated every 2-3 questions
    - Questions adapt based on your answers
+   - If interrupted, use `/lisa:resume` to continue
 
 3. **Completion Detection**: When you say "done", "finalize", "finished", "that's all", "complete", or "wrap up"
 
@@ -266,10 +294,11 @@ lisa/
 │   └── plugin.json          # Plugin metadata (name, version, author)
 ├── commands/
 │   ├── plan.md              # Main command (/lisa:plan)
+│   ├── resume.md            # Resume interrupted interviews (/lisa:resume)
+│   ├── cleanup.md           # Clean up state files (/lisa:cleanup)
 │   └── help.md              # Help documentation (/lisa:help)
 ├── hooks/
-│   ├── hooks.json           # Hook registration (stop hook)
-│   └── stop-hook.sh         # Interview continuation logic
+│   └── hooks.json           # Hook configuration (minimal)
 ├── scripts/
 │   └── setup-lisa.sh        # Interview initialization
 └── README.md
@@ -277,7 +306,7 @@ lisa/
 
 ## Version
 
-- **Version:** 1.0.7
+- **Version:** 1.1.0 (with resume and cleanup commands)
 - **Author:** BLEN Engineering Team
 
 ---

@@ -16,15 +16,25 @@
 - Verification: plan.md has FINALIZATION CONSTRAINTS section with forbidden actions
 - Completed: 2026-01-18
 
-### Phase 3: Add Resume Command [PENDING]
-- [ ] Create commands/resume.md
-- [ ] Implement logic to scan .claude/lisa-*.md files
-- [ ] Parse feature name and timestamp from each
-- [ ] Present list to user via AskUserQuestion
-- [ ] Load selected state and continue interview
-- [ ] Handle empty case with helpful message
+### Phase 3: Add Resume Command [COMPLETE]
+- [x] Create commands/resume.md
+- [x] Implement logic to scan .claude/lisa-*.md files
+- [x] Parse feature name and timestamp from each
+- [x] Present list to user via AskUserQuestion
+- [x] Load selected state and continue interview
+- [x] Handle empty case with helpful message
+- Verification: Resume command created with full interview continuation logic
+- Completed: 2026-01-18
 
-### Phase 4: Add Cleanup Command [PENDING]
-- [ ] Create commands/cleanup.md
-- [ ] Implement deletion of all .claude/lisa-*.md files
-- [ ] Show confirmation message
+### Phase 4: Add Cleanup Command [COMPLETE]
+- [x] Create commands/cleanup.md
+- [x] Implement deletion of all .claude/lisa-*.md files
+- [x] Show confirmation message
+- Verification: Cleanup command created with state file removal logic
+- Completed: 2026-01-18
+
+### Additional Updates
+- [x] Updated help.md to document /lisa:resume and /lisa:cleanup commands
+- [x] Updated README.md with new commands and removed stop hook references
+- [x] Bumped version to 1.1.0 in plugin.json and README.md
+- [x] Updated plugin structure documentation
